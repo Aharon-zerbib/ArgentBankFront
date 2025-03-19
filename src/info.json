@@ -15,5 +15,22 @@
       "title": "Security you can trust",
       "paragraph": "We use top of the line encryption to make sure your data and money is always safe."
     }
+  ],
+  "transactions": [
+    {
+      "title": "Argent Bank Checking (x8349)",
+      "montant": "2,082.79",
+      "available": "Available Balance"
+    },
+    {
+      "title": "Argent Bank Savings (x6712)",
+      "montant": "10,928.42",
+      "available": "Available Balance"
+    },
+    {
+      "title": "Argent Bank Credit Card (x8349)",
+      "montant": "184.30",
+      "available": "Current Balance"
+    }
   ]
 }
