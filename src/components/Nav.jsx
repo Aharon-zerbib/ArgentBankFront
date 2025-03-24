@@ -1,15 +1,16 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/UserSlice";
 import logo from "../assets/images/argentBankLogo.png";
 import "../scss/Nav.scss";
 
 const NavBar = () => {
-  const navigate = useNavigate();
-
-  const token = localStorage.getItem("token");
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    dispatch(logout());
     navigate("/login");
   };
 
@@ -24,7 +25,7 @@ const NavBar = () => {
         <h1 className="sr-only">Argent Bank</h1>
       </NavLink>
       <div className="main-nav-right">
-        {token ? (
+        {user ? (
           <button
             className="main-nav-item logout-button"
             onClick={handleLogout}
