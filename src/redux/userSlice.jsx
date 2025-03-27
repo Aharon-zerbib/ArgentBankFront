@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Création requet pour connexion de utilisateur
+// creation Login
 export const loginUser = createAsyncThunk(
   "user/loginUser",
   async (userCredentials, { rejectWithValue }) => {
@@ -10,47 +10,82 @@ export const loginUser = createAsyncThunk(
         "http://localhost:3001/api/v1/user/login",
         userCredentials
       );
-      //stockage de données dans le local storage
       localStorage.setItem("user", JSON.stringify(response.data));
       return response.data;
     } catch (error) {
-      //retourne erreur si requête échoue
       return rejectWithValue(error.response?.data || "Login failed");
     }
   }
 );
 
-// Création du slice pour la gestion de utilisateur
+// creation updateUserProfile
+export const updateUserProfile = createAsyncThunk(
+  "user/updateUserProfile",
+  async (userData, { getState, rejectWithValue }) => {
+     //getState recupere state
+     //rejectWithValue renvoye erreur
+    const { token } = getState().user;
+    try {
+      const response = await axios.put(
+        "http://localhost:3001/api/v1/user/profile",
+        { userName: userData.userName },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Profile update failed");
+    }
+  }
+);
+
+// creation userSlice
 const userSlice = createSlice({
   name: "user",
-  //état initial du slice
   initialState: {
     loading: false,
-    user: JSON.parse(localStorage.getItem("user")) || null,
+    user: null,
+    token: null,
     error: null,
   },
+  //reducers definiactions
   reducers: {
     logout: (state) => {
-      //suppression de données dans local storage
       localStorage.removeItem("user");
       state.user = null;
+      state.token = null;
     },
   },
-  //gestion des actions
+  //extraReducers gere actions asynchrones
   extraReducers: (builder) => {
     builder
-      //quant action est en cours
+    //addCase gere l'action
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      //quand action est réussie
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        state.token = action.payload.body.token;
       })
-      //quand action échoue
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = { ...state.user, ...action.payload };
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -59,5 +94,3 @@ const userSlice = createSlice({
 
 export const { logout } = userSlice.actions;
 export default userSlice.reducer;
-
-// rajouter le PUT pour modifier les données de l'utilisateur
