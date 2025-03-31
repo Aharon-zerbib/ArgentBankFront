@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// creation Login
+// Action pour la connexion de l'utilisateur
 export const loginUser = createAsyncThunk(
   "user/loginUser",
   async (userCredentials, { rejectWithValue }) => {
@@ -13,17 +13,15 @@ export const loginUser = createAsyncThunk(
       localStorage.setItem("user", JSON.stringify(response.data));
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Login failed");
+      return rejectWithValue(error.response?.data || "Échec de la connexion");
     }
   }
 );
 
-// creation updateUserProfile
+// Action pour mettre à jour le profil de l'utilisateur
 export const updateUserProfile = createAsyncThunk(
   "user/updateUserProfile",
   async (userData, { getState, rejectWithValue }) => {
-     //getState recupere state
-     //rejectWithValue renvoye erreur
     const { token } = getState().user;
     try {
       const response = await axios.put(
@@ -32,38 +30,58 @@ export const updateUserProfile = createAsyncThunk(
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            
           },
         }
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Profile update failed");
+      return rejectWithValue(error.response?.data || "Échec de la mise à jour du profil");
     }
   }
 );
 
-// creation userSlice
+// Action pour récupérer le profil de l'utilisateur
+export const getUserProfile = createAsyncThunk(
+  "user/getUserProfile",
+  async (_, { getState, rejectWithValue }) => {
+    const { token } = getState().user;
+    try {
+      const response = await axios.get(
+        "http://localhost:3001/api/v1/user/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data.body;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Erreur lors de la récupération du profil");
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState: {
     loading: false,
-    user: null,
-    token: null,
+    // Chargement des informations utilisateur directement depuis le localStorage
+    user: JSON.parse(localStorage.getItem("user")) || null,
+    userName: JSON.parse(localStorage.getItem("user"))?.body?.userName || null,
+    token: JSON.parse(localStorage.getItem("user"))?.body?.token || null,
     error: null,
   },
-  //reducers definiactions
   reducers: {
+    // Action pour la déconnexion
     logout: (state) => {
       localStorage.removeItem("user");
       state.user = null;
+      state.userName = null;
       state.token = null;
     },
   },
-  //extraReducers gere actions asynchrones
   extraReducers: (builder) => {
     builder
-    //addCase gere l'action
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -72,6 +90,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.user = action.payload;
         state.token = action.payload.body.token;
+        state.userName = action.payload.body.userName;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -86,6 +105,18 @@ const userSlice = createSlice({
         state.user = { ...state.user, ...action.payload };
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userName = action.payload.userName;
+      })
+      .addCase(getUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

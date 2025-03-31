@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../redux/UserSlice";
+import { loginUser } from "../redux/userSlice";
 import NavBar from "../components/Nav";
 import "../scss/Login.scss";
 
