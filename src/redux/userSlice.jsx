@@ -10,7 +10,7 @@ export const loginUser = createAsyncThunk(
         "http://localhost:3001/api/v1/user/login",
         userCredentials
       );
-      localStorage.setItem("user", JSON.stringify(response.data));
+    
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Échec de la connexion");
@@ -65,14 +65,13 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     loading: false,
-    // Chargement des informations utilisateur directement depuis le localStorage
-    user: JSON.parse(localStorage.getItem("user")) || null,
-    userName: JSON.parse(localStorage.getItem("user"))?.body?.userName || null,
-    token: JSON.parse(localStorage.getItem("user"))?.body?.token || null,
+ 
+    user: null,
+    userName: null,
+    token: null,
     error: null,
   },
   reducers: {
-    // Action pour la déconnexion
     logout: (state) => {
       localStorage.removeItem("user");
       state.user = null;
