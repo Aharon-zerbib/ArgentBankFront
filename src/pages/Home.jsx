@@ -1,10 +1,11 @@
 import NavBar from "../components/Nav";
-import Containerhome from "../components/ContainerHome";
+import ContainerHP from "../components/ContainerHP";
 import "../scss/Home.scss";
 import info from "../info.json";
 import chat from "../assets/images/icon-chat.png";
 import money from "../assets/images/icon-money.png";
 import security from "../assets/images/icon-security.png";
+import "../scss/ContainerHome.scss";
 
 const images = [chat, money, security];
 
@@ -24,7 +25,8 @@ const Home = () => {
             </p>
           </section>
         </div>
-        <Containerhome>
+        <ContainerHP>
+          <div className="container">
           {info.card.map((item, index) => (
             <div key={item.id} className="container-item">
               <div className="container-font">
@@ -37,8 +39,8 @@ const Home = () => {
                 <div className="subtitle">{item.paragraph}</div>
               </div>
             </div>
-          ))}
-        </Containerhome>
+          ))}</div>
+        </ContainerHP>
       </div>
     </>
   );
