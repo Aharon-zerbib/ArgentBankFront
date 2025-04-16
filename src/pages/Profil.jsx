@@ -40,7 +40,7 @@ const Profil = () => {
         <div className="header-account">
           {isEditing ? (
             <>
-              <h1>Edit User info</h1>
+              <h1 className="edit">Edit User info</h1>
               <div className="container-input">
                 <div>
                   <label>Username: </label>
@@ -69,7 +69,7 @@ const Profil = () => {
               </div>
             </>
           ) : (
-            <>
+            <div className="header-content">
               <h1>
                 Welcome back
                 <br />
@@ -78,7 +78,7 @@ const Profil = () => {
               <button className="edit-button" onClick={handleEditClick}>
                 Edit Name
               </button>
-            </>
+            </div>
           )}
         </div>
         <h2 className="sr-only">Accounts</h2>

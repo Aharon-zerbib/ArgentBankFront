@@ -8,6 +8,7 @@ import "../scss/Login.scss";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // État pour le message d'erreur
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.user);
@@ -21,8 +22,16 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const userCredentials = { email, password }; //creation de mes credentials email/password
-    dispatch(loginUser(userCredentials));
+    const userCredentials = { email, password };
+
+    try {
+      // Dispatch de l'action loginUser
+      await dispatch(loginUser(userCredentials)).unwrap();
+      setError(""); // Réinitialise l'erreur en cas de succès
+    } catch (err) {
+      // Capture et affiche l'erreur
+      setError("Désolé, email ou mot de passe incorrect.");
+    }
   };
 
   return (
@@ -58,6 +67,7 @@ const Login = () => {
                 <input type="checkbox" id="remember-me" />
                 <label htmlFor="remember-me">Remember me</label>
               </div>
+              {error && <p className="error-message">{error}</p>} {/* Affiche le message d'erreur */}
               <button type="submit" className="sign-in-button">
                 Sign In
               </button>
